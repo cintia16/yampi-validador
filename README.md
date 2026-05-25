@@ -1,1 +1,0 @@
-# yampi-validador

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Yampi — Validador de Planos</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --yampi-purple: #A85DEE;
+    --yampi-black: #221D25;
+    --yampi-orange: #FF7309;
+    --yampi-cream: #E2DDCF;
+    --yampi-green: #2FBE55;
+    --yampi-blue: #8BD4DD;
+    --yampi-lime: #D5E91E;
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE8;
+    --text-primary: #221D25;
+    --text-secondary: #6B6570;
+    --text-muted: #A09AA6;
+    --border: rgba(34,29,37,0.1);
+    --border-strong: rgba(34,29,37,0.2);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  html { background: var(--bg); }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HEADER */
+  .top-bar {
+    background: var(--yampi-black);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .yampi-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .yampi-logo svg { width: 28px; height: 22px; }
+
+  .yampi-logo-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--yampi-cream);
+    letter-spacing: -0.02em;
+  }
+
+  .top-bar-sep {
+    width: 1px;
+    height: 20px;
+    background: rgba(226,221,207,0.2);
+    margin: 0 4px;
+  }
+
+  .top-bar-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(226,221,207,0.6);
+    letter-spacing: 0.02em;
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .page-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--yampi-black);
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .page-title span { color: var(--yampi-purple); }
+
+  .page-desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 36px;
+    max-width: 540px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  /* PLAN SELECTOR */
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+  @media (max-width: 700px) {
+    .plan-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .plan-btn {
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 14px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+    position: relative;
+  }
+
+  .plan-btn:hover {
+    border-color: var(--yampi-purple);
+    background: rgba(168,93,238,0.04);
+  }
+
+  .plan-btn.active {
+    border: 2px solid var(--yampi-purple);
+    background: rgba(168,93,238,0.06);
+  }
+
+  .plan-btn .pname {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .plan-btn .pprice {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 3px;
+  }
+
+  .plan-btn .ptax {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--yampi-purple);
+  }
+
+  /* INPUTS */
+  .inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  @media (max-width: 480px) {
+    .inputs-grid { grid-template-columns: 1fr; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 8px; }
+
+  .field label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .field input {
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    transition: border-color 0.15s;
+  }
+
+  .field input:focus {
+    outline: none;
+    border-color: var(--yampi-purple);
+    background: white;
+  }
+
+  .field input::placeholder { color: var(--text-muted); }
+
+  /* BUTTON */
+  .btn-calc {
+    width: 100%;
+    background: var(--yampi-purple);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-calc:hover { background: #9748dc; }
+  .btn-calc:active { transform: scale(0.99); }
+
+  /* RESULTS */
+  #resultArea { display: none; }
+  #resultArea.visible { display: block; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 8px 0 24px;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 520px) {
+    .metrics-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .metric {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+
+  .metric .mlabel {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .metric .mval {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .metric .msub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  /* COMPARE GRID */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 700px) {
+    .compare-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .pc {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    background: var(--surface);
+    position: relative;
+  }
+
+  .pc.is-current { border: 2px solid var(--yampi-purple); }
+  .pc.is-best { border: 2px solid var(--yampi-green); }
+  .pc.is-current-and-best { border: 2px solid var(--yampi-green); }
+
+  .pc-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 0.03em;
+  }
+
+  .badge-current { background: rgba(168,93,238,0.12); color: var(--yampi-purple); }
+  .badge-best { background: rgba(47,190,85,0.12); color: #1a9945; }
+  .badge-ideal { background: rgba(47,190,85,0.12); color: #1a9945; }
+
+  .pc-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .pc-info { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
+
+  .pc-cost-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 4px; }
+  .pc-cost { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+
+  .pc-diff {
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  .diff-pos { background: rgba(47,190,85,0.1); color: #1a9945; }
+  .diff-neg { background: rgba(255,115,9,0.1); color: #c95500; }
+  .diff-neut { background: var(--surface2); color: var(--text-muted); }
+
+  /* VERDICT */
+  .verdict {
+    border-radius: var(--radius);
+    padding: 20px 22px;
+  }
+
+  .verdict-ideal {
+    background: rgba(47,190,85,0.07);
+    border: 1px solid rgba(47,190,85,0.25);
+  }
+
+  .verdict-upgrade {
+    background: rgba(168,93,238,0.06);
+    border: 1px solid rgba(168,93,238,0.2);
+  }
+
+  .verdict-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .verdict-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .verdict-text strong { color: var(--text-primary); font-weight: 600; }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="yampi-logo">
+    <svg viewBox="0 0 63 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0.97V17.27H16.15V33.58H32.31V0.97H0Z" fill="#E2DDCF"/>
+      <path d="M39.21 0.97H62.63L49.09 50.97H25.67L39.21 0.97Z" fill="#E2DDCF"/>
+    </svg>
+    <span class="yampi-logo-text">yampi</span>
+  </div>
+  <div class="top-bar-sep"></div>
+  <span class="top-bar-label">Validador de Planos · Uso interno</span>
+</div>
+
+<div class="main">
+  <h1 class="page-title">Qual é o plano <span>ideal</span><br>para essa loja?</h1>
+  <p class="page-desc">Informe o plano atual do cliente e o faturamento dos últimos 3 meses. A ferramenta calcula o custo real em cada plano e indica se vale a pena migrar.</p>
+
+  <div class="card">
+    <div class="card-title">Plano atual do cliente</div>
+    <div class="plan-grid" id="planSelector">
+      <button class="plan-btn" data-plan="basic" onclick="selectPlan('basic')">
+        <div class="pname">Basic</div>
+        <div class="pprice">Grátis</div>
+        <div class="ptax">2,5% / venda</div>
+      </button>
+      <button class="plan-btn" data-plan="essential" onclick="selectPlan('essential')">
+        <div class="pname">Essential</div>
+        <div class="pprice">R$ 47/mês</div>
+        <div class="ptax">2,5% / venda</div>
+      </button>
+      <button class="plan-btn" data-plan="starter" onclick="selectPlan('starter')">
+        <div class="pname">Starter</div>
+        <div class="pprice">R$ 157/mês</div>
+        <div class="ptax">2,0% / venda</div>
+      </button>
+      <button class="plan-btn" data-plan="pro" onclick="selectPlan('pro')">
+        <div class="pname">Pro</div>
+        <div class="pprice">R$ 527/mês</div>
+        <div class="ptax">1,5% / venda</div>
+      </button>
+      <button class="plan-btn" data-plan="business" onclick="selectPlan('business')">
+        <div class="pname">Business</div>
+        <div class="pprice">R$ 1.497/mês</div>
+        <div class="ptax">0,5% / venda</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Faturamento dos últimos 3 meses (R$)</div>
+    <div class="inputs-grid">
+      <div class="field">
+        <label>Mês 1</label>
+        <input type="number" id="m1" placeholder="ex: 30.000" min="0" />
+      </div>
+      <div class="field">
+        <label>Mês 2</label>
+        <input type="number" id="m2" placeholder="ex: 35.000" min="0" />
+      </div>
+      <div class="field">
+        <label>Mês 3</label>
+        <input type="number" id="m3" placeholder="ex: 40.000" min="0" />
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calcular()">Calcular plano ideal →</button>
+  </div>
+
+  <div id="resultArea">
+    <div class="card">
+      <div class="card-title">Resumo do faturamento</div>
+      <div class="metrics-grid">
+        <div class="metric">
+          <div class="mlabel">Total (3 meses)</div>
+          <div class="mval" id="res-total"></div>
+        </div>
+        <div class="metric">
+          <div class="mlabel">Média mensal</div>
+          <div class="mval" id="res-media"></div>
+        </div>
+        <div class="metric">
+          <div class="mlabel">Custo atual / mês</div>
+          <div class="mval" id="res-custo"></div>
+          <div class="msub" id="res-custo-sub"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="card-title" style="margin-bottom:16px">Comparativo entre planos</div>
+      <div class="compare-grid" id="compareGrid"></div>
+
+      <div class="verdict" id="verdictBox">
+        <div class="verdict-title" id="verdictTitle"></div>
+        <div class="verdict-text" id="verdictText"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Yampi · Ferramenta de uso interno · Os valores são estimativas baseadas na média mensal de faturamento.
+</div>
+
+<script>
+const PLANS = [
+  { id: 'basic',     name: 'Basic',     mensalidade: 0,    taxa: 0.025 },
+  { id: 'essential', name: 'Essential', mensalidade: 47,   taxa: 0.025 },
+  { id: 'starter',   name: 'Starter',   mensalidade: 157,  taxa: 0.020 },
+  { id: 'pro',       name: 'Pro',       mensalidade: 527,  taxa: 0.015 },
+  { id: 'business',  name: 'Business',  mensalidade: 1497, taxa: 0.005 },
+];
+
+let selectedPlan = null;
+
+function selectPlan(id) {
+  selectedPlan = id;
+  document.querySelectorAll('.plan-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-plan="${id}"]`).classList.add('active');
+}
+
+function fmt(v) {
+  return 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+}
+
+function calcular() {
+  const m1 = parseFloat(document.getElementById('m1').value) || 0;
+  const m2 = parseFloat(document.getElementById('m2').value) || 0;
+  const m3 = parseFloat(document.getElementById('m3').value) || 0;
+
+  if (!selectedPlan) { alert('Selecione o plano atual do cliente.'); return; }
+  if (m1 + m2 + m3 === 0) { alert('Informe ao menos um mês de faturamento.'); return; }
+
+  const total = m1 + m2 + m3;
+  const media = total / 3;
+  const current = PLANS.find(p => p.id === selectedPlan);
+  const custoAtual = current.mensalidade + (media * current.taxa);
+
+  document.getElementById('res-total').textContent = fmt(total);
+  document.getElementById('res-media').textContent = fmt(media);
+  document.getElementById('res-custo').textContent = fmt(custoAtual);
+  document.getElementById('res-custo-sub').textContent =
+    `${fmt(current.mensalidade)} mensalidade + ${(current.taxa * 100).toFixed(1)}% sobre ${fmt(media)}`;
+
+  const custos = PLANS.map(p => ({ ...p, custo: p.mensalidade + (media * p.taxa) }));
+  const melhor = custos.reduce((a, b) => a.custo < b.custo ? a : b);
+  const isIdeal = melhor.id === selectedPlan;
+
+  let html = '';
+  custos.forEach(p => {
+    const isCurrent = p.id === selectedPlan;
+    const isBest = p.id === melhor.id;
+    const diff = p.custo - custoAtual;
+
+    let cardClass = 'pc';
+    if (isCurrent && isBest) cardClass += ' is-current-and-best';
+    else if (isCurrent) cardClass += ' is-current';
+    else if (isBest) cardClass += ' is-best';
+
+    let badge = '';
+    if (isCurrent && isBest) badge = '<span class="pc-badge badge-ideal">✓ Atual · Ideal</span>';
+    else if (isCurrent) badge = '<span class="pc-badge badge-current">Plano atual</span>';
+    else if (isBest) badge = '<span class="pc-badge badge-best">✓ Recomendado</span>';
+    else badge = '<span style="display:block;height:22px;margin-bottom:10px"></span>';
+
+    let diffHtml = '';
+    if (!isCurrent) {
+      const cls = diff < 0 ? 'diff-pos' : 'diff-neg';
+      const txt = diff < 0 ? `↓ economiza ${fmt(Math.abs(diff))}/mês` : `↑ custa mais ${fmt(Math.abs(diff))}/mês`;
+      diffHtml = `<span class="pc-diff ${cls}">${txt}</span>`;
+    } else {
+      diffHtml = `<span class="pc-diff diff-neut">plano atual</span>`;
+    }
+
+    html += `
+      <div class="${cardClass}">
+        ${badge}
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-info">${p.mensalidade === 0 ? 'Grátis' : fmt(p.mensalidade) + '/mês'} · ${(p.taxa*100).toFixed(1)}%</div>
+        <div class="pc-cost-label">Custo estimado/mês</div>
+        <div class="pc-cost">${fmt(p.custo)}</div>
+        ${diffHtml}
+      </div>`;
+  });
+
+  document.getElementById('compareGrid').innerHTML = html;
+
+  const verdictBox = document.getElementById('verdictBox');
+  const verdictTitle = document.getElementById('verdictTitle');
+  const verdictText = document.getElementById('verdictText');
+
+  if (isIdeal) {
+    verdictBox.className = 'verdict verdict-ideal';
+    verdictTitle.textContent = '✓ O plano atual já é o ideal';
+    verdictText.innerHTML = `Com média mensal de <strong>${fmt(media)}</strong>, o plano <strong>${current.name}</strong> oferece o menor custo total: <strong>${fmt(custoAtual)}/mês</strong>. Não há vantagem financeira em migrar agora.`;
+  } else {
+    const economia = custoAtual - melhor.custo;
+    verdictBox.className = 'verdict verdict-upgrade';
+    verdictTitle.textContent = `→ Plano recomendado: ${melhor.name}`;
+    verdictText.innerHTML = `Com média mensal de <strong>${fmt(media)}</strong>, migrar para o plano <strong>${melhor.name}</strong> reduz o custo de <strong>${fmt(custoAtual)}/mês</strong> para <strong>${fmt(melhor.custo)}/mês</strong> — uma economia de <strong>${fmt(economia)}/mês</strong> (${fmt(economia * 12)}/ano).`;
+  }
+
+  document.getElementById('resultArea').style.display = 'block';
+  document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
